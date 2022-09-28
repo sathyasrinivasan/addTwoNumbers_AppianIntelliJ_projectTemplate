@@ -1,0 +1,47 @@
+<appian-plugin name="Sathya Plugin Display Name" key="org.appiansc.plugins.addNumbers">
+
+  <plugin-info>
+    <description>Sathya Plugin Description</description>
+    <vendor name="Appian Corporation" url="http://www.appian.com"/>
+    <version>1.0.0</version>
+    <application-version min="22.2"/>
+  </plugin-info>
+
+<!--  <enumeration key="listOfStringItems" type="3">-->
+<!--    <items>-->
+<!--      <item>-->
+<!--        <label>Item 2</label>-->
+<!--        <detail>Tooltip for item 2</detail>-->
+<!--        <value>String value for item 2</value>-->
+<!--      </item>-->
+<!--      <item>-->
+<!--        <label>Item 1</label>-->
+<!--        <detail>Tooltip for item 1</detail>-->
+<!--        <value>String value for item 1</value>-->
+<!--      </item>-->
+<!--    </items>-->
+<!--  </enumeration>-->
+
+<!--  <datatype key="MyPluginDatatypes" name="My Plugin Data Types">-->
+<!--    <class>org.appiansc.plugins.addNumbers.datatypes.ExampleDatatype</class>-->
+<!--  </datatype>-->
+
+  <function-category key="sathyaPluginCategory" name="Sathya Plugin Functions"/>
+
+  <function key="addTwoNumbersExpressionFunction"
+            class="org.appiansc.plugins.addNumbers.expressions.AddTwoNumbersExpressionFunction"/>
+
+  <smart-service name="Sathya Smart Service"
+                 key="sathyaSmartService"
+                 class="org.appiansc.plugins.addNumbers.smartservices.SathyaSmartService"/>
+
+  <connected-system-template key="HelloWorldConnectedSystem" name="HelloWorldConnectedSystem"
+                             class="org.appiansc.plugins.addNumbers.connectedSystem.HelloWorldConnectedSystemTemplate">
+
+    <integration-template key="HelloWorldIntegrationTemplate" name="HelloWorldIntegrationTemplate"
+                          class="org.appiansc.plugins.addNumbers.connectedSystem.HelloWorldIntegrationTemplate" />
+
+  </connected-system-template>
+
+
+</appian-plugin>

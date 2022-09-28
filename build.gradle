@@ -1,0 +1,97 @@
+buildscript {
+  dependencies {
+    classpath 'org.hidetake:gradle-ssh-plugin:2.10.1'
+  }
+}
+
+plugins {
+  id 'java'
+  id 'groovy'
+  id 'org.owasp.dependencycheck' version '7.1.2'
+}
+
+apply plugin: 'org.hidetake.ssh'
+remotes {
+  moxie {
+    host = 'appian-sat-gcp-plugin-001.appiancorp.com'
+    user = 'sathya_srinivasan'
+    password = 'sathya'
+  }
+}
+
+repositories {
+  jcenter()
+  mavenCentral()
+  flatDir {
+    dirs 'dependencies/lib-compile'
+  }
+}
+
+dependencies {
+  // Appian CS dependencies
+  compileOnly 'com.appian:connected-systems-core:1.2.0'
+  implementation 'com.appian:connected-systems-client:1.1.0'
+  testImplementation 'com.appian:connected-systems-core:1.2.0'
+
+  // Appian (non-CS) plugin dependencies
+  compileOnly fileTree(dir: 'dependencies/lib-compile', include: '*.jar')
+  implementation fileTree(dir: 'dependencies/lib', include: '*.jar')
+
+  implementation 'net.datafaker:datafaker:1.6.0'
+  implementation 'com.google.code.gson:gson:2.9.1'
+
+  // These are found in Appian's classpath (<APPIAN_HOME>/deployment/web.war/WEB-INF/lib)
+  compileOnly 'org.apache.logging.log4j:log4j-1.2-api:2.17.1'
+  compileOnly 'commons-codec:commons-codec:1.13'
+  compileOnly 'commons-lang:commons-lang:2.6'
+  compileOnly 'commons-io:commons-io:2.9.0'
+}
+
+
+configurations {
+  implementation.transitive = false
+}
+
+
+jar {
+  dependsOn check
+  duplicatesStrategy = DuplicatesStrategy.FAIL
+
+  configurations.implementation.setCanBeResolved(true)
+
+  into('META-INF/lib') {
+    from(configurations.implementation)
+  }
+
+  into('src') {
+    from(sourceSets.main.allJava)
+  }
+
+  manifest {
+    attributes("Spring-Context": "*;publish-context:=false")
+  }
+}
+
+
+archivesBaseName = "addTwoNumbers"
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+
+// If this shows as an error in IntelliJ, simply ignore
+version = new groovy.xml.XmlSlurper().parse(file('src/main/resources/appian-plugin.xml')).'plugin-info'.version
+
+
+task deployToAppian {
+  group = 'build'
+  dependsOn jar
+
+  doLast {
+    ssh.run {
+      session(remotes.moxie) {
+        put from: 'build/libs/addTwoNumbers-1.0.0.jar', into: '/home/sathya_srinivasan/appian223/_admin/plugins/'
+      }
+    }
+  }
+}
